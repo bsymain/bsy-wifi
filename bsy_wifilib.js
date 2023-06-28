@@ -8,53 +8,206 @@ const { execSync, spawn } = require("child_process");
 
 function myExec(command){
   console.log(command)
-  op = String(execSync(command))
-  console.log(op)
+  try {
+    op = String(execSync(command))
+    console.log(op)
+  }
+  catch (err){ 
+    op="";
+    //console.log("output", err)
+    console.log("sdterr",err.stderr.toString())
+  }
   return op
 }
 
-var wifi_list=myExec("nmcli dev wifi list")
+function check_radio_status(){
+  op = myExec("nmcli  radio wifi")
+  if (op=="enabled\n"){
+    radio_on = 1;
+  }
+  else{
+    radio_on = 0;
+  }
+  return radio_on
 
-try {
-  fs.writeFileSync("tmp/wifi_list.txt" , wifi_list);
-  // file written successfully
-} catch (err) {
-  console.error(err);
+}
+
+function check_wifi_existence(){
+  op = myExec("nmcli --get-value name,type  con show  | grep  802-11-wireless  |  sed '/BSY-Hotspot:/d'")
+  if (op==""){
+    wifi_exist = 0 ;
+  }
+  else{
+    wifi_exist = 1 ;
+  }
+  return wifi_exist
+}
+
+function check_wifi_network_connection(){
+  op = myExec("nmcli --get-value name,type  con show --active | grep  802-11-wireless  |  sed '/BSY-Hotspot:/d'")
+  if (op==""){
+    wifi_connected = 0 ;
+  }
+  else{
+    wifi_connected = 1 ;
+  }
+  return wifi_connected
+}
+
+function check_hotspot_connection(){
+  op = myExec("nmcli --get-value name  con show --active | grep BSY-Hotspot")
+  if (op==""){
+    hotspot_connected = 0 ;
+  }
+  else{
+    hotspot_connected = 1 ;
+  }
+  return hotspot_connected
+}
+
+
+function check_domain_connection(domain){
+  op = myExec("curl -Is  "+domain+" | head -n 1 | grep HTTP")
+  if (op==""){
+    domain_connected = 0 ;
+  }
+  else{
+    domain_connected = 1 ;
+  }
+  return domain_connected
+}
+
+function wait_on_connection(time_seconds){
+  for  ( i= 0;  i< time_seconds ; i++){
+    if (!check_domain_connection("http://www.google.com")){
+      myExec("sleep 1")
+    }
+    else{
+      break;
+    }
+  }
 }
 
 
 
-	myExec("nmcli conn up BSY-Hotspot")
+//~ if (! check_radio_status()){
+  //~ myExec("nmcli  radio wifi on");
+  //~ execSync("sleep 1")
+  //~ check_radio_status()
   
-  execSync("sleep 1")
+//~ }
+
+//~ console.log("WiFi Connected")
+//~ console.log(check_wifi_network_connection())
+//~ execSync("sleep 1")
+
+//~ console.log("Hotspot Connected")
+//~ console.log(check_hotspot_connection())
+
+//~ console.log("Domain Connection")
+//~ console.log()
+
+function ensure_wifi_connectivity() {
+    if( ! check_wifi_existence()){
+      setup_connection()
+    }
+    
+    n_attempts = 0;
+
+    while( ! check_domain_connection("http://www.google.com")   ){
+      console.log("No internet")
+      
+
+      
+        if (check_hotspot_connection()){
+          console.log("Hotspot was on. Turning it off.")
+          myExec("sudo ./bsy_iptable_clear.sh")
+          myExec("nmcli conn down BSY-Hotspot")
+          wait_on_connection(30)
+        }
+        else{
+          if (check_wifi_network_connection()){
+            console.log("WiFi Connected but no internet")
+            setup_connection()
+          }
+          else {
+            if (! check_radio_status()){
+              console.log("WiFi was off")
+              myExec("nmcli  radio wifi on");
+              wait_on_connection(30)
+            }
+            else {
+              console.log("Power Cycling radio")
+              myExec("nmcli  radio wifi off");
+              myExec("sleep 2")
+              myExec("nmcli  radio wifi on");
+              wait_on_connection()
+
+              n_attempts = n_attempts + 1
+              
+              if (n_attempts > 3){
+                n_attempts = 0 ;
+                setup_connection()
+              }
+            }
+            
+        }
+        
+      }
+
+    
+  }
   
-  console.log('Setting IP tables')
-  myExec("sudo ./bsy_iptable_config.sh")
-  
-  
-  console.log('Starting Server')
-  myExec("./bsy_server.sh")
-  
-  
-  
-  
+}
+
+ensure_wifi_connectivity()
+
+function setup_connection(){
+
+  var wifi_list=myExec("nmcli dev wifi list")
+
+  try {
+    fs.writeFileSync("tmp/wifi_list.txt" , wifi_list);
+    // file written successfully
+  } catch (err) {
+    console.error(err);
+  }
+
+
+
+    myExec("nmcli conn up BSY-Hotspot")
+    
+    execSync("sleep 1")
+    
+    console.log('Setting IP tables')
+    myExec("sudo ./bsy_iptable_config.sh")
+    
+    
+    console.log('Starting Server')
+    myExec("./bsy_server.sh")
+    
+    
+    
+    
+
+
+      
+      const netName = fs.readFileSync("tmp/wifi_ssid.txt", 'utf8');
+      const netPass = fs.readFileSync("tmp/wifi_password.txt", 'utf8');
 
 
     
-    const netName = fs.readFileSync("tmp/wifi_ssid.txt", 'utf8');
-    const netPass = fs.readFileSync("tmp/wifi_password.txt", 'utf8');
+    
 
-
+    myExec("sudo ./bsy_iptable_clear.sh")
+    
+    myExec("nmcli conn down BSY-Hotspot")
+    execSync("sleep 3")
+    
+    // TODO What if there is space in name or password
+    myExec("nmcli dev wifi connect "+ netName + " password " + netPass) 
   
-  
-
-  myExec("sudo ./bsy_iptable_clear.sh")
-  
-  myExec("nmcli conn down BSY-Hotspot")
-  execSync("sleep 3")
-  
-  // TODO What if there is space in name or password
-  myExec("nmcli dev wifi connect "+ netName + " password " + netPass) 
+}
 
 	
   
