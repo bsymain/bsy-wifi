@@ -110,6 +110,7 @@ function wait_on_connection(time_seconds){
 function ensure_wifi_connectivity() {
     if( ! check_wifi_existence()){
       setup_connection()
+      wait_on_connection(30)
     }
     
     n_attempts = 0;
