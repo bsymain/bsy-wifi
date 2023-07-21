@@ -18,7 +18,7 @@ app.get('/token', (req, res) => {
     if (token) {
         return res.send(token);
     }
-    request.get('http://localhost:4000/token', (error, response, body) => { 
+    request.get('https://pizoom-hicsxm6moa-uc.a.run.app/token', (error, response, body) => { 
         console.log(body);
         myCache.set("token", body, 10000000);
         return res.send(body);
