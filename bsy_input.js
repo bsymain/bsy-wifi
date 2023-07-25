@@ -93,9 +93,13 @@ app.post('/', function(request, response, next){
     console.error(err);
   }
 
-  var r = String(execSync("ls -la"))
-  console.log(r)
-  response.write(r.replace(/(?:\r\n|\r|\n)/g, '<br>'));
+  //~ var r = String(execSync("ls -la"))
+  //~ console.log(r)
+  //~ response.write(r.replace(/(?:\r\n|\r|\n)/g, '<br>'));
+  //~ response.end();
+  //~ process.exit()
+  
+  response.write("Information received. Trying to connect ...");
   response.end();
   process.exit()
 
