@@ -142,7 +142,7 @@ function ensure_wifi_connectivity() {
               myExec("nmcli  radio wifi off");
               myExec("sleep 2")
               myExec("nmcli  radio wifi on");
-              wait_on_connection()
+              wait_on_connection(30)
 
               n_attempts = n_attempts + 1
               
@@ -160,8 +160,10 @@ function ensure_wifi_connectivity() {
   }
   
 }
-
-ensure_wifi_connectivity()
+while(1){
+  ensure_wifi_connectivity()
+  execSync("sleep 1")
+}
 
 function setup_connection(){
 
