@@ -77,30 +77,34 @@ app.post('/', function(request, response, next){
   // process.kill(-pid);
 
   console.log(request.body);
-  console.log(request.body.first_name);
+  console.log(request.body.action);
  
 
-  response.writeHead(200, {'Content-Type': 'text/html'});
-  response.write("The date and time are currently: " + request.body.ssid);
-  
-  
-  const content = 'Some content!';
 
-  try {
-    fs.writeFileSync('tmp/wifi_ssid.txt', request.body.ssid);
-    fs.writeFileSync('tmp/wifi_password.txt', request.body.password);
-  } catch (err) {
-    console.error(err);
+  
+  
+  if (request.body.action=="Submit") {
+
+    try {
+      fs.writeFileSync('tmp/wifi_ssid.txt', request.body.ssid);
+      fs.writeFileSync('tmp/wifi_password.txt', request.body.password);
+    } catch (err) {
+      console.error(err);
+    }
+
+    //~ var r = String(execSync("ls -la"))
+    //~ console.log(r)
+    //~ response.write(r.replace(/(?:\r\n|\r|\n)/g, '<br>'));
+    //~ response.end();
+    //~ process.exit()
+    
+    response.write("Information received. Trying to connect ...");
+    response.end();
   }
-
-  //~ var r = String(execSync("ls -la"))
-  //~ console.log(r)
-  //~ response.write(r.replace(/(?:\r\n|\r|\n)/g, '<br>'));
-  //~ response.end();
-  //~ process.exit()
-  
-  response.write("Information received. Trying to connect ...");
-  response.end();
+  else{
+    response.write("Operation canceled. Attempting with last configured network ...");
+    response.end();
+  }
   process.exit()
 
 
