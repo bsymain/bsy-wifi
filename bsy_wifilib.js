@@ -109,6 +109,7 @@ function wait_on_connection(time_seconds){
 
 function ensure_wifi_connectivity() {
     if( ! check_wifi_existence()){
+      fs.writeFileSync('tmp/connection_status.txt', '1');
       setup_connection()
       wait_on_connection(30)
     }
@@ -148,6 +149,7 @@ function ensure_wifi_connectivity() {
               
               if (n_attempts > 3){
                 n_attempts = 0 ;
+                fs.writeFileSync('tmp/connection_status.txt', '1');
                 setup_connection()
               }
             }
@@ -158,6 +160,7 @@ function ensure_wifi_connectivity() {
 
     
   }
+  fs.writeFileSync('tmp/connection_status.txt', '1');
   
 }
 while(1){
