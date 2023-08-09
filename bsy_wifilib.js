@@ -5,6 +5,9 @@
 const fs = require('fs');
 const { execSync, spawn } = require("child_process");
 
+const main_dir = "/home/pi/Documents/bsy-wifi/"
+var tmp_dir = main_dir + "tmp/"
+
 
 function myExec(command){
   console.log(command)
@@ -109,7 +112,7 @@ function wait_on_connection(time_seconds){
 
 function ensure_wifi_connectivity() {
     if( ! check_wifi_existence()){
-      fs.writeFileSync('tmp/connection_status.txt', '1');
+      fs.writeFileSync(tmp_dir+'connection_status.txt', '1');
       setup_connection()
       wait_on_connection(30)
     }
@@ -123,7 +126,7 @@ function ensure_wifi_connectivity() {
       
         if (check_hotspot_connection()){
           console.log("Hotspot was on. Turning it off.")
-          myExec("sudo ./bsy_iptable_clear.sh")
+          myExec("sudo " + main_dir+ "bsy_iptable_clear.sh")
           myExec("nmcli conn down BSY-Hotspot")
           wait_on_connection(30)
         }
@@ -141,16 +144,17 @@ function ensure_wifi_connectivity() {
             else {
               console.log("Power Cycling radio")
               myExec("nmcli  radio wifi off");
-              myExec("sleep 2")
+              myExec("sleep 3")
               myExec("nmcli  radio wifi on");
               wait_on_connection(30)
 
               n_attempts = n_attempts + 1
               
-              if (n_attempts > 3){
+              if (n_attempts > 0){
                 n_attempts = 0 ;
-                fs.writeFileSync('tmp/connection_status.txt', '1');
+                fs.writeFileSync(tmp_dir+'connection_status.txt', '1');
                 setup_connection()
+                wait_on_connection(30)
               }
             }
             
@@ -160,7 +164,7 @@ function ensure_wifi_connectivity() {
 
     
   }
-  fs.writeFileSync('tmp/connection_status.txt', '1');
+  fs.writeFileSync(tmp_dir+'connection_status.txt', '0');
   
 }
 while(1){
@@ -173,7 +177,7 @@ function setup_connection(){
   var wifi_list=myExec("nmcli dev wifi list")
 
   try {
-    fs.writeFileSync("tmp/wifi_list.txt" , wifi_list);
+    fs.writeFileSync(tmp_dir+"wifi_list.txt" , wifi_list);
     // file written successfully
   } catch (err) {
     console.error(err);
@@ -186,11 +190,11 @@ function setup_connection(){
     execSync("sleep 1")
     
     console.log('Setting IP tables')
-    myExec("sudo ./bsy_iptable_config.sh")
+    myExec("sudo " + main_dir +"./bsy_iptable_config.sh")
     
     
     console.log('Starting Server')
-    myExec("./bsy_server.sh")
+    myExec(main_dir + "./bsy_server.sh")
     
     
     
@@ -198,14 +202,14 @@ function setup_connection(){
 
 
       
-      const netName = fs.readFileSync("tmp/wifi_ssid.txt", 'utf8');
-      const netPass = fs.readFileSync("tmp/wifi_password.txt", 'utf8');
+      const netName = fs.readFileSync(tmp_dir+"wifi_ssid.txt", 'utf8');
+      const netPass = fs.readFileSync(tmp_dir+"wifi_password.txt", 'utf8');
 
 
     
     
 
-    myExec("sudo ./bsy_iptable_clear.sh")
+    myExec("sudo " + main_dir + "./bsy_iptable_clear.sh")
     
     myExec("nmcli conn down BSY-Hotspot")
     execSync("sleep 3")

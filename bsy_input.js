@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser= require('body-parser')
 
+const main_dir = "/home/pi/Documents/bsy-wifi/"
 
 const app = express();
 app.set('view options', { pretty: true });
@@ -17,7 +18,7 @@ var pid
 app.get('/', function(request, response, next){
     var wifi_list
     try {
-      const data = fs.readFileSync('tmp/wifi_list.txt', 'utf8');
+      const data = fs.readFileSync(main_dir+'tmp/wifi_list.txt', 'utf8');
       console.log(data);
       wifi_list = data.toString()
       wifi_list = wifi_list.replace(/(?:\r\n|\r|\n)/g, '<br>')
@@ -25,7 +26,7 @@ app.get('/', function(request, response, next){
       console.error(err);
     }
     
-    let html = fs.readFileSync("index.html", 'utf8');
+    let html = fs.readFileSync(main_dir+"index.html", 'utf8');
     if(html)
     response.send(html.replace('${wifi_list}',wifi_list));
 
@@ -86,8 +87,8 @@ app.post('/', function(request, response, next){
   if (request.body.action=="Submit") {
 
     try {
-      fs.writeFileSync('tmp/wifi_ssid.txt', request.body.ssid);
-      fs.writeFileSync('tmp/wifi_password.txt', request.body.password);
+      fs.writeFileSync(main_dir+'tmp/wifi_ssid.txt', request.body.ssid);
+      fs.writeFileSync(main_dir+'tmp/wifi_password.txt', request.body.password);
     } catch (err) {
       console.error(err);
     }
