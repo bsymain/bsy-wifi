@@ -215,7 +215,7 @@ function setup_connection(){
     execSync("sleep 3")
     
     // TODO What if there is space in name or password
-    myExec("nmcli dev wifi connect "+ netName + " password " + netPass) 
+    myExec("nmcli dev wifi connect '"+ netName + "' password '" + netPass+"'") 
   
 }
 
