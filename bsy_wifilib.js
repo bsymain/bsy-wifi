@@ -8,6 +8,7 @@ const { execSync, spawn } = require("child_process");
 const main_dir = "/home/pi/Documents/bsy-wifi/"
 var tmp_dir = main_dir + "tmp/"
 
+const conn_wait_time = 60
 
 function myExec(command){
   console.log(command)
@@ -83,7 +84,11 @@ function check_domain_connection(domain){
 function wait_on_connection(time_seconds){
   for  ( i= 0;  i< time_seconds ; i++){
     if (!check_domain_connection("http://www.google.com")){
-      myExec("sleep 1")
+      fs.writeFileSync(tmp_dir+'connection_status.txt', '0');
+      myExec("sleep 0.5")
+      fs.writeFileSync(tmp_dir+'connection_status.txt', '1');
+      myExec("sleep 0.5")
+      
     }
     else{
       break;
@@ -114,7 +119,7 @@ function ensure_wifi_connectivity() {
     if( ! check_wifi_existence()){
       fs.writeFileSync(tmp_dir+'connection_status.txt', '1');
       setup_connection()
-      wait_on_connection(45)
+      wait_on_connection(conn_wait_time)
     }
     
     n_attempts = 0;
@@ -128,7 +133,7 @@ function ensure_wifi_connectivity() {
           console.log("Hotspot was on. Turning it off.")
           myExec("sudo " + main_dir+ "bsy_iptable_clear.sh")
           myExec("nmcli conn down BSY-Hotspot")
-          wait_on_connection(45)
+          wait_on_connection(conn_wait_time)
         }
         else{
           if (check_wifi_network_connection()){
@@ -139,14 +144,14 @@ function ensure_wifi_connectivity() {
             if (! check_radio_status()){
               console.log("WiFi was off")
               myExec("nmcli  radio wifi on");
-              wait_on_connection(45)
+              wait_on_connection(conn_wait_time)
             }
             else {
               console.log("Power Cycling radio")
               myExec("nmcli  radio wifi off");
               myExec("sleep 3")
               myExec("nmcli  radio wifi on");
-              wait_on_connection(45)
+              wait_on_connection(conn_wait_time)
 
               n_attempts = n_attempts + 1
               
@@ -154,7 +159,7 @@ function ensure_wifi_connectivity() {
                 n_attempts = 0 ;
                 fs.writeFileSync(tmp_dir+'connection_status.txt', '1');
                 setup_connection()
-                wait_on_connection(45)
+                wait_on_connection(conn_wait_time)
               }
             }
             
