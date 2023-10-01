@@ -11,8 +11,11 @@ global start
 
 main_dir = "/home/pi/Documents/bsy-wifi/"
 
-BUTTON_GPIO = 16
-LED_GPIO = 21
+BUTTON_GPIO = 12
+R_LED_GPIO = 21
+G_LED_GPIO = 20
+B_LED_GPIO = 16
+
 def signal_handler(sig, frame):
     GPIO.cleanup()
     sys.exit(0)
@@ -48,7 +51,9 @@ if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(BUTTON_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
-    GPIO.setup(LED_GPIO, GPIO.OUT)
+    GPIO.setup(R_LED_GPIO, GPIO.OUT)
+    GPIO.setup(G_LED_GPIO, GPIO.OUT)
+    GPIO.setup(B_LED_GPIO, GPIO.OUT)
     
     GPIO.add_event_detect(BUTTON_GPIO, GPIO.BOTH, 
             callback=button_callback, bouncetime=10)
@@ -57,10 +62,26 @@ if __name__ == '__main__':
 
     while 1:
         with open(main_dir +'tmp/connection_status.txt','r') as f:
-            if f.read()[0]== '1':
-                GPIO.output(LED_GPIO, True)
-            else:
-                GPIO.output(LED_GPIO, False)
+            c = f.read()[0]
+        with open(main_dir +'tmp/meeting_status.txt','r') as f:
+            m = f.read()[0]
+                
+        if c== '1':
+            GPIO.output(R_LED_GPIO, True)
+            GPIO.output(G_LED_GPIO, False)
+            GPIO.output(B_LED_GPIO, False)
+        elif c== '0' and m=='0':
+            GPIO.output(R_LED_GPIO, False)
+            GPIO.output(G_LED_GPIO, False)
+            GPIO.output(B_LED_GPIO, True)
+        elif m== '1':
+            GPIO.output(R_LED_GPIO, False)
+            GPIO.output(G_LED_GPIO, True)
+            GPIO.output(B_LED_GPIO, False)
+        else:
+            GPIO.output(R_LED_GPIO, False)
+            GPIO.output(G_LED_GPIO, False)
+            GPIO.output(B_LED_GPIO, False)
         time.sleep(0.5)
 
     

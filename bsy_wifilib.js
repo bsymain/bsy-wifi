@@ -86,14 +86,16 @@ function wait_on_connection(time_seconds){
     if (!check_domain_connection("http://www.google.com")){
       fs.writeFileSync(tmp_dir+'connection_status.txt', '0');
       myExec("sleep 0.5")
-      fs.writeFileSync(tmp_dir+'connection_status.txt', '1');
+      fs.writeFileSync(tmp_dir+'connection_status.txt', 'x');
       myExec("sleep 0.5")
       
     }
     else{
-      break;
+      fs.writeFileSync(tmp_dir+'connection_status.txt', '0');
+      return;
     }
   }
+  fs.writeFileSync(tmp_dir+'connection_status.txt', '1');
 }
 
 
