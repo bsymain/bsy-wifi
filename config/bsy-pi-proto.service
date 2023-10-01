@@ -1,0 +1,12 @@
+[Unit]
+Description=Handle PI IO
+
+
+[Service]
+ExecStart=/usr/bin/meetingsdk-sample-angular
+Type=simple
+Restart=always
+
+
+[Install]
+WantedBy=default.target

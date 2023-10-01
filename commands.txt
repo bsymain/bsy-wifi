@@ -1,0 +1,69 @@
+# Send keyboard commands
+xdotool key ctrl+r
+
+# mute/unmute
+amixer set Capture toggle
+
+
+
+# Configure RPI to use network manager (lookup online)
+
+# Set network manager ip to 192.168.1.1
+
+# Setup DNS hijacking
+sudo mousepad /etc/NetworkManager/dnsmasq-shared.d/captive.conf
+address=/#/192.168.1.1
+
+
+# Run our server
+python3 -m http.server 8080
+
+
+# Send redirect request to our server
+sudo python   ~/Documents/myserver.py 80 http://192.168.1.1:8080
+
+
+# Redirect all traffic to our server
+sudo iptables -t nat -A PREROUTING -p tcp -m tcp -s 192.168.1.0/24 --dport 80 -j DNAT --to-destination 192.168.1.1
+sudo iptables -t nat -A PREROUTING -p tcp -m tcp -s 192.168.1.0/24 --dport 443 -j DNAT --to-destination 192.168.1.1
+
+
+nmcli conn up BSY-Hotspot
+
+Get Wifi List
+
+https://www.makeuseof.com/connect-to-wifi-with-nmcli/
+
+nmcli --get-values ssid,SIGNAL,CHAN  dev wifi list
+
+nmcli  dev wifi connect SamerNet password myPassword
+
+
+nmcli --get-values NAME con show
+
+
+nmcli con down "SamerNet 1"
+
+nmcli con delete "SamerNet 1"
+
+
+visudo
+pi ALL=NOPASSWD: /home/pi/Documents/scripts/redirect.sh
+
+
+# Service
+
+mkdir -p ~/.config/systemd/user
+
+sudo systemctl daemon-reload
+
+systemctl --user enable  bsy-pi-io
+
+systemctl --user start  bsy-pi-io
+
+systemctl --user stop  bsy-pi-io
+
+systemctl --user disable  bsy-pi-io
+
+
+

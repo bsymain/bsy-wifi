@@ -1,0 +1,12 @@
+[Unit]
+Description=Handle PI WiFi
+
+
+[Service]
+ExecStart=/usr/bin/node /home/pi/Documents/bsy-wifi/bsy_wifilib.js
+Type=simple
+Restart=always
+
+
+[Install]
+WantedBy=default.target

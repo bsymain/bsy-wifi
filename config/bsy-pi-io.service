@@ -1,0 +1,12 @@
+[Unit]
+Description=Handle PI IO
+
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/Documents/bsy-wifi/bsy_handle_io.py
+Type=simple
+Restart=always
+
+
+[Install]
+WantedBy=default.target
