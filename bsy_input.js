@@ -99,12 +99,14 @@ app.post('/', function(request, response, next){
     //~ response.end();
     //~ process.exit()
     
-    response.write("Information received. Trying to connect ...");
-    response.end();
+    // response.write("Information received. Trying to connect ...");
+    // response.end();
+    response.send("Information received. Trying to connect ...");
   }
   else{
-    response.write("Operation canceled. Attempting with last configured network ...");
-    response.end();
+    //response.write("Operation canceled. Attempting with last configured network ...");
+    //response.end();
+    response.send("Operation canceled. Attempting with last configured network ...");
   }
   process.exit()
 
