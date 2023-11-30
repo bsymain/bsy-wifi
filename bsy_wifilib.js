@@ -181,7 +181,8 @@ while(1){
 
 function setup_connection(){
 
-  var wifi_list=myExec("nmcli dev wifi list")
+  // var wifi_list=myExec("nmcli dev wifi list")
+  var wifi_list=myExec("nmcli --get-values ssid,SIGNAL,CHAN,BARS,RATE,CHAN,SECURITY  dev wifi list")
 
   try {
     fs.writeFileSync(tmp_dir+"wifi_list.txt" , wifi_list);
