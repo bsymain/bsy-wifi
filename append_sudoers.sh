@@ -6,6 +6,7 @@ fname=$2
 
 echo "pi ALL=NOPASSWD: $(pwd)/bsy_iptable_config.sh
 pi ALL=NOPASSWD: $(pwd)/bsy_iptable_clear.sh
+pi ALL=NOPASSWD: /usr/local/bin/mraa-gpio
 " | tee -a $fname
 
 

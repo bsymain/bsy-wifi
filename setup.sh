@@ -23,3 +23,12 @@ mkdir -p tmp/
 
 # Install npm package
 npm install express
+
+export DISTRO=focal-stable
+wget -O - apt.radxa.com/$DISTRO/public.key | sudo apt-key add -
+
+sudo sh -c  "echo 'deb http://apt.radxa.com/focal-stable/ focal main' >> /etc/apt/sources.list.d/apt-radxa-com.list"
+sudo  sh -c "echo 'deb http://apt.radxa.com/focal-testing/ focal main' >> /etc/apt/sources.list.d/apt-radxa-com.list"
+
+sudo apt install -y libmraa 
+

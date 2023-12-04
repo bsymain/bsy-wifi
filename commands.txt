@@ -67,3 +67,11 @@ systemctl --user disable  bsy-pi-io
 
 
 
+mraa-gpio list
+
+https://wiki.radxa.com/Zero/dev/libmraa
+
+pi ALL=NOPASSWD: /usr/local/bin/mraa-gpio
+
+sudo mraa-gpio  set 3 0
+
