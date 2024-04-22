@@ -1,14 +1,10 @@
-
-
-
-
 const fs = require('fs');
 const { execSync, spawn } = require("child_process");
 
-const main_dir = "/home/pi/Documents/bsy-wifi/"
+const main_dir = "./"
 var tmp_dir = main_dir + "tmp/"
 
-const conn_wait_time = 60
+const conn_wait_time = 5
 
 function myExec(command){
   console.log(command)
@@ -134,7 +130,7 @@ function ensure_wifi_connectivity() {
         if (check_hotspot_connection()){
           console.log("Hotspot was on. Turning it off.")
           myExec("sudo " + main_dir+ "bsy_iptable_clear.sh")
-          myExec("nmcli conn down BSY-Hotspot")
+          myExec("sudo nmcli conn down BSY-Hotspot")
           wait_on_connection(conn_wait_time)
         }
         else{
@@ -193,16 +189,16 @@ function setup_connection(){
 
 
 
-    myExec("nmcli conn up BSY-Hotspot")
+    myExec("sudo nmcli conn up BSY-Hotspot")
     
     execSync("sleep 1")
     
     console.log('Setting IP tables')
-    myExec("sudo " + main_dir +"./bsy_iptable_config.sh")
+    myExec("sudo " + main_dir +"bsy_iptable_config.sh")
     
     
     console.log('Starting Server')
-    myExec(main_dir + "./bsy_server.sh")
+    myExec(main_dir + "bsy_server.sh")
     
     
     
@@ -217,13 +213,13 @@ function setup_connection(){
     
     
 
-    myExec("sudo " + main_dir + "./bsy_iptable_clear.sh")
+    myExec("sudo " + main_dir + "bsy_iptable_clear.sh")
     
     myExec("nmcli conn down BSY-Hotspot")
     execSync("sleep 3")
     
     // TODO What if there is space in name or password
-    myExec("nmcli dev wifi connect '"+ netName + "' password '" + netPass+"'") 
+    myExec("sudo nmcli dev wifi connect '"+ netName + "' password '" + netPass+"'") 
   
 }
 

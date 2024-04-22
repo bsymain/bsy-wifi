@@ -2,7 +2,7 @@
 const express = require('express');
 const bodyParser= require('body-parser')
 
-const main_dir = "/home/pi/Documents/bsy-wifi/"
+const main_dir = "./"
 
 const app = express();
 app.set('view options', { pretty: true });
