@@ -124,6 +124,7 @@ function ensure_wifi_connectivity() {
       wait_on_connection(conn_wait_time)
     }
     
+    wait_on_connection(conn_wait_time)
     n_attempts = 0;
 
     while( ! check_domain_connection("http://www.google.com")   ){

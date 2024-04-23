@@ -3,7 +3,7 @@ Description=Handle PI IO
 
 
 [Service]
-ExecStart=/usr/bin/meetingsdk-sample-angular
+ExecStart=/usr/bin/actlab
 Type=simple
 Restart=always
 
